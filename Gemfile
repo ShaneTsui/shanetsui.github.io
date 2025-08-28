@@ -14,3 +14,13 @@ gem "wdm", "~> 0.1", :platforms => [:mingw, :x64_mingw, :mswin]
   
 gemspec
 
+# Use Jekyll 3.x to avoid sass-embedded/protobuf; use Ruby Sass (no native deps)
+gem "jekyll", "~> 3.9.3"
+gem "jekyll-sass-converter", "~> 1.5.2"
+gem "sass", "~> 3.7.4"
+
+# Livereload plugin for Jekyll 3.x
+group :jekyll_plugins do
+  gem "jekyll-livereload", "~> 0.2.2"
+end
+

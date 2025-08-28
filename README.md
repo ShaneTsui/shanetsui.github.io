@@ -250,7 +250,7 @@ Commands:
 cd /Users/shanetsui/Documents/Project/shanetsui.github.io
 gem install bundler
 bundle install
-bundle exec jekyll serve
+bundle exec jekyll serve --livereload --livereload-port 35730
 ```
 
 Open in browser:
