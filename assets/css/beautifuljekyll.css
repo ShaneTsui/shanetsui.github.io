@@ -50,7 +50,17 @@ body > main {
 }
 p {
   line-height: 1.5;
-  margin: 1.875rem 0;
+  margin: 1.25rem 0;
+}
+
+/* Reduce spacing around lists */
+ul, ol {
+  margin: 0.75rem 0;
+  /* padding-left: 1.5rem; */
+}
+
+li {
+  margin: 0.25rem 0;
 }
 h1,h2,h3,h4,h5,h6 {
   font-family: var(--header-font);
