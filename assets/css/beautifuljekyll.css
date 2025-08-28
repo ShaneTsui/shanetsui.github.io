@@ -827,6 +827,20 @@ nav.top-nav-short-permanent ~ header > .intro-header.big-img {
   }
 }
 
+/* Mobile title and subtitle sizing to prevent line breaks */
+@media (max-width: 767px) {
+  .intro-header .page-heading h1 {
+    font-size: 1.75rem;
+    line-height: 1.2;
+  }
+  
+  .intro-header .page-heading .page-subheading,
+  .intro-header .post-heading .post-subheading {
+    font-size: 1rem;
+    line-height: 1.3;
+  }
+}
+
 /* --- Pagination --- */
 
 .pagination {
