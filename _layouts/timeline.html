@@ -15,25 +15,35 @@ layout: page
 
 <div class="timeline-container">
   {% if category_posts.size > 0 %}
-    {% for post in category_posts %}
-    <div class="timeline-item" data-tags="{{ post.tags | join: ' ' }}">
-      <div class="timeline-date">
-        <div class="date-year">{{ post.date | date: "%Y" }}</div>
-        <div class="date-month">{{ post.date | date: "%b" }}</div>
-      </div>
-      <div class="timeline-content">
-        <div class="post-card">
-          <h3 class="post-title">
-            <a href="{{ post.url | absolute_url }}">{{ post.title | strip_html }}</a>
-          </h3>
-          {% if post.summary %}
-            <p class="post-summary">{{ post.summary }}</p>
-          {% elsif post.excerpt %}
-            <p class="post-summary">{{ post.excerpt | strip_html | truncatewords: 15 }}</p>
-          {% endif %}
+    {% assign grouped_posts = category_posts | group_by_exp: "post", "post.date | date: '%Y'" | sort: "name" | reverse %}
+    {% for group in grouped_posts %}
+      {% assign year = group.name %}
+      <div class="timeline-group" data-year-month="{{ group.name }}" data-year="{{ year }}" data-has-posts="true">
+        <div class="group-header" data-year="{{ year }}">
+          <div class="date-display">
+            <div class="date-year">{{ year }}</div>
+          </div>
         </div>
+        {% for post in group.items %}
+        <div class="timeline-item" data-tags="{{ post.tags | join: ' ' }}">
+          <div class="timeline-date">
+            <div class="date-month-day">{{ post.date | date: "%b" }} {{ post.date | date: "%-d" }}</div>
+          </div>
+          <div class="timeline-content">
+            <div class="post-card">
+              <h3 class="post-title">
+                <a href="{{ post.url | absolute_url }}">{{ post.title | strip_html }}</a>
+              </h3>
+              {% if post.summary %}
+                <p class="post-summary">{{ post.summary }}</p>
+              {% elsif post.excerpt %}
+                <p class="post-summary">{{ post.excerpt | strip_html | truncatewords: 15 }}</p>
+              {% endif %}
+            </div>
+          </div>
+        </div>
+        {% endfor %}
       </div>
-    </div>
     {% endfor %}
   {% else %}
     <div class="empty-state">
@@ -42,6 +52,13 @@ layout: page
       <p>{{ page.empty_message | default: "Content is on its way!" }}</p>
     </div>
   {% endif %}
+</div>
+
+<!-- Sticky Header -->
+<div class="sticky-header" id="stickyHeader">
+  <div class="sticky-date">
+    <div class="sticky-year" id="stickyYear"></div>
+  </div>
 </div>
 
 <style>
@@ -84,10 +101,61 @@ layout: page
   margin: 3rem 0;
 }
 
+.timeline-group {
+  margin-bottom: 3rem;
+}
+
+/* hide empty groups after tag filtering */
+.timeline-group.hidden {
+  display: none;
+}
+
+.group-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 2rem;
+  padding: 1.5rem 2rem;
+  background: linear-gradient(135deg, var(--theme-color), #0056b3);
+  border-radius: 12px;
+  color: white;
+  box-shadow: 0 4px 15px rgba(0, 123, 255, 0.2);
+}
+
+.date-display {
+  display: flex;
+  align-items: baseline;
+  gap: 1rem;
+}
+
+.date-year {
+  font-size: 2.5rem;
+  font-weight: 800;
+  line-height: 1;
+}
+
+.date-month {
+  font-size: 1.2rem;
+  font-weight: 500;
+  opacity: 0.9;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}
+
+.post-count {
+  background: rgba(255, 255, 255, 0.2);
+  padding: 0.5rem 1rem;
+  border-radius: 20px;
+  font-size: 0.9rem;
+  font-weight: 500;
+  backdrop-filter: blur(10px);
+}
+
 .timeline-item {
   display: flex;
   align-items: flex-start;
-  margin-bottom: 2rem;
+  margin-bottom: 1.5rem;
+  margin-left: 2rem;
   opacity: 1;
   transform: translateX(0);
   transition: all 0.5s ease;
@@ -105,23 +173,17 @@ layout: page
   flex-shrink: 0;
   width: 80px;
   text-align: center;
-  margin-right: 2rem;
+  margin-right: 1.5rem;
   padding-top: 0.5rem;
 }
 
-.date-year {
-  font-size: 1.2rem;
-  font-weight: 700;
+.date-month-day {
+  font-size: 1.1rem;
+  font-weight: 600;
   color: var(--theme-color);
   line-height: 1.2;
-}
-
-.date-month {
-  font-size: 0.9rem;
-  color: #6c757d;
   text-transform: uppercase;
   letter-spacing: 0.5px;
-  margin-top: 0.25rem;
 }
 
 .timeline-content {
@@ -167,6 +229,37 @@ layout: page
   font-size: 1rem;
 }
 
+/* Sticky Header */
+.sticky-header {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  background: rgba(255, 255, 255, 0.95);
+  backdrop-filter: blur(10px);
+  border-bottom: 2px solid var(--theme-color);
+  padding: 1rem 2rem;
+  z-index: 1000;
+  transform: translateY(-100%);
+  transition: transform 0.3s ease;
+  box-shadow: 0 2px 20px rgba(0, 0, 0, 0.1);
+}
+
+.sticky-header.visible {
+  transform: translateY(0);
+}
+
+.sticky-date {
+  display: flex;
+  justify-content: center;
+}
+
+.sticky-year {
+  font-size: 2rem;
+  font-weight: 800;
+  color: var(--theme-color);
+}
+
 .empty-state {
   text-align: center;
   padding: 3rem;
@@ -185,9 +278,25 @@ layout: page
 
 /* Mobile responsiveness */
 @media (max-width: 768px) {
+  .group-header {
+    padding: 1rem;
+    flex-direction: column;
+    gap: 1rem;
+    text-align: center;
+  }
+  
+  .date-year {
+    font-size: 2rem;
+  }
+  
+  .date-month {
+    font-size: 1rem;
+  }
+  
   .timeline-item {
     flex-direction: column;
     align-items: flex-start;
+    margin-left: 1rem;
   }
   
   .timeline-date {
@@ -206,6 +315,14 @@ layout: page
     flex-wrap: wrap;
     justify-content: center;
   }
+  
+  .sticky-header {
+    padding: 0.75rem 1rem;
+  }
+  
+  .sticky-year {
+    font-size: 1.5rem;
+  }
 }
 </style>
 
@@ -213,7 +330,10 @@ layout: page
 document.addEventListener('DOMContentLoaded', function() {
   const tagButtons = document.querySelectorAll('.tag-btn');
   const timelineItems = document.querySelectorAll('.timeline-item');
+  const stickyHeader = document.getElementById('stickyHeader');
+  const stickyYear = document.getElementById('stickyYear');
   
+  // Tag filtering functionality
   tagButtons.forEach(button => {
     button.addEventListener('click', function() {
       const selectedTag = this.dataset.tag;
@@ -232,7 +352,69 @@ document.addEventListener('DOMContentLoaded', function() {
           item.classList.add('hidden');
         }
       });
+
+      // Hide/show year groups based on visible posts after filtering
+      document.querySelectorAll('.timeline-group').forEach(group => {
+        const visiblePosts = group.querySelectorAll('.timeline-item:not(.hidden)').length;
+        if (visiblePosts > 0) {
+          group.classList.remove('hidden');
+        } else {
+          group.classList.add('hidden');
+        }
+      });
+
+      // Recompute sticky header
+      updateStickyHeader();
     });
   });
+  
+  // Sticky header functionality
+  let ticking = false;
+  function updateStickyHeader() {
+    const scrollTop = window.pageYOffset || document.documentElement.scrollTop;
+    const windowHeight = window.innerHeight;
+    
+    if (scrollTop > windowHeight * 0.3) {
+      // Find which group is currently in view
+      const groups = document.querySelectorAll('.timeline-group');
+      let currentGroup = null;
+      
+      groups.forEach(group => {
+        const rect = group.getBoundingClientRect();
+        if (rect.top <= 100 && rect.bottom >= 100) {
+          currentGroup = group;
+        }
+      });
+      
+      // Only show sticky header if there are posts in the current year
+      if (currentGroup && currentGroup.dataset.hasPosts === 'true') {
+        const header = currentGroup.querySelector('.group-header');
+        const year = header.dataset.year;
+        
+        stickyYear.textContent = year;
+        stickyHeader.classList.add('visible');
+      } else {
+        stickyHeader.classList.remove('visible');
+      }
+    } else {
+      stickyHeader.classList.remove('visible');
+    }
+    // allow further animation frame requests
+    ticking = false;
+  }
+  
+  // Throttle scroll events for better performance
+  function requestTick() {
+    if (!ticking) {
+      requestAnimationFrame(updateStickyHeader);
+      ticking = true;
+    }
+  }
+  
+  window.addEventListener('scroll', requestTick);
+  window.addEventListener('resize', requestTick);
+  
+  // Initial update
+  updateStickyHeader();
 });
 </script>
