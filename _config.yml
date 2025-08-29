@@ -20,6 +20,9 @@ author: Shane Tsui
 ###############################################
 
 navbar-links:
+  Articles:
+    - Life: "life"
+    - Tech: "tech"
   About Me: "aboutme"
   # Resources:
   #   - Beautiful Jekyll: "https://beautifuljekyll.com"
@@ -139,7 +142,7 @@ navbar-var-length: false
 page-col: "#FFFFFF"
 text-col: "#404040"
 link-col: "#008AFF"
-hover-col: "#0085A1"
+hover-col: "#FFD700"
 navbar-col: "#1DA1F2"
 navbar-text-col: "#FFFFFF"
 navbar-border-col: "#1DA1F2"
